@@ -10,6 +10,9 @@ import org.hamcrest.Matchers;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
@@ -24,12 +27,6 @@ public class VerbTest {
         RequestSpecBuilder reqBuilder = new RequestSpecBuilder();
         reqBuilder.log(LogDetail.ALL);
         reqSpec = reqBuilder.build();
-
-//        ResponseSpecBuilder resBuilder = new ResponseSpecBuilder();
-//        resBuilder.expectStatusCode(201);
-//        resSpec = resBuilder.build();
-//
-//        requestSpecification = reqSpec;
         responseSpecification = resSpec;
     }
 
@@ -47,6 +44,46 @@ public class VerbTest {
                 .body("id", is(notNullValue()))
                 .body("name", is("Jose"))
                 .body("age", is(50))
+        ;
+    }
+
+    @Test
+    public void SaveUserUsingMap(){
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("name","Frederico");
+        params.put("age",18);
+
+        given()
+                .contentType("application/json")
+                .pathParam("entidade", "users")
+                .body(params)
+        .when()
+                .post("/{entidade}")
+        .then()
+                .log().all()
+                .statusCode(201)
+                .body("id", is(notNullValue()))
+                .body("name", is("Frederico"))
+                .body("age", is(18))
+        ;
+    }
+
+    @Test
+    public void SaveUserUsingobject(){
+        User user = new User("Usuario via objeto",35);
+
+        given()
+                .contentType("application/json")
+                .pathParam("entidade","users")
+                .body(user)
+        .when()
+                .post("{entidade}")
+        .then()
+            .log().all()
+            .statusCode(201)
+            .body("id", is(notNullValue()))
+            .body("name", is("Usuario via objeto"))
+            .body("age", is(35))
         ;
     }
 
@@ -149,6 +186,21 @@ public class VerbTest {
         .then()
                 .log().all()
                 .statusCode(204)
+        ;
+    }
+
+    @Test
+    public void removeFollUser(){
+        given()
+                .log().all()
+                .contentType("application/json")
+                .pathParam("entidade","users")
+        .when()
+                .delete("/{entidade}/1000")
+        .then()
+            .log().all()
+            .statusCode(400)
+            .body("error", is("Registro inexistente"))
         ;
     }
 }
