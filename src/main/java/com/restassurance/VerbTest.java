@@ -7,6 +7,7 @@ import io.restassured.filter.log.LogDetail;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -69,7 +70,7 @@ public class VerbTest {
     }
 
     @Test
-    public void SaveUserUsingobject(){
+    public void SaveUserUsingObject(){
         User user = new User("Usuario via objeto",35);
 
         given()
@@ -85,6 +86,27 @@ public class VerbTest {
             .body("name", is("Usuario via objeto"))
             .body("age", is(35))
         ;
+    }
+
+    @Test
+    public void SaveUserUsingDeserializadoObject(){
+        User user = new User("Usuario deserializado",35);
+
+        User userAdded = given()
+                .contentType("application/json")
+                .pathParam("entidade","users")
+                .body(user)
+        .when()
+                .post("{entidade}")
+        .then()
+                .log().all()
+                .statusCode(201)
+                .extract().body().as(User.class)
+        ;
+        System.out.println(userAdded);
+        Assert.assertThat(userAdded.getId(), notNullValue());
+        Assert.assertEquals("Usuario deserializado", userAdded.getName());
+        Assert.assertThat(userAdded.getAge(), is(35));
     }
 
     @Test
@@ -116,6 +138,25 @@ public class VerbTest {
                 .body("@id",is(notNullValue()))
                 .body("user.name", is("Jose"))
                 .body("user.age",is("50"))
+        ;
+    }
+
+    @Test
+    public void shouldSaveUserByXMLUsingXML(){
+        User user = new User("Usuario XML",40);
+
+         given()
+                .log().all()
+                .contentType("application/XML")
+                .body(user)
+         .when()
+                .post("/usersXML")
+         .then()
+                .log().all()
+                .statusCode(201)
+                .body("@id",is(notNullValue()))
+                .body("user.name", is("Usuario XML"))
+                .body("user.age",is("40"))
         ;
     }
 
