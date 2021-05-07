@@ -7,11 +7,13 @@ import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.hamcrest.Matchers;
+import org.hamcrest.xml.HasXPath;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.responseSpecification;
+import static org.hamcrest.Matchers.hasXPath;
 import static org.hamcrest.Matchers.is;
 
 public class HTML {
@@ -20,7 +22,7 @@ public class HTML {
     public static ResponseSpecification resSpec;
 
     @BeforeClass
-    public static void setup(){
+    public static void setup() {
         RestAssured.baseURI = "https://restapi.wcaquino.me";
 
         RequestSpecBuilder requestSpecBuilder = new RequestSpecBuilder();
@@ -30,21 +32,37 @@ public class HTML {
     }
 
     @Test
-    public void searchingHTML(){
+    public void searchingHTML() {
         given()
                 .log().all()
-        .when()
+                .when()
                 .get("/v2/users")
-        .then()
+                .then()
                 .log().all()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
                 .body("html.body.div.table.tbody.tr.size()", is(3))
                 .body("html.body.div.table.tbody.tr[1].td[2]", is("25"))
                 .appendRootPath("html.body.div.table.tbody")
-                .body("tr.find{it.toString().startsWith('2')}.td[1]",is("Maria Joaquina"))
+                .body("tr.find{it.toString().startsWith('2')}.td[1]", is("Maria Joaquina"))
         ;
     }
 
+    @Test
+    public void searchingHTMLusingXpath(){
+        given()
+                .log().all()
+                .when()
+                .get("/v2/users?format=clean")
+                .then()
+                .log().all()
+                .statusCode(200)
+                .contentType(ContentType.HTML)
+                .body(hasXPath("count(//table/tr)", is("4")))
+                .body(hasXPath("//td[text()='2']/../td[2]", is("Maria Joaquina")))
+        ;
+    }
 
 }
+
+
