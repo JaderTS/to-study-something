@@ -179,7 +179,7 @@ public class VerbTest {
         Assert.assertThat(usuarioInserido.getId(), notNullValue());
         Assert.assertThat(usuarioInserido.getName(), is("Usuario XML"));
         Assert.assertThat(usuarioInserido.getAge(), is(40));
-        Assert.assertThat(usuarioInserido.getSalary(), notNullValue());
+        Assert.assertThat(usuarioInserido.getSalary(), nullValue());
     }
 
     @Test
