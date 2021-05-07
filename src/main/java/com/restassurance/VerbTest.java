@@ -161,6 +161,28 @@ public class VerbTest {
     }
 
     @Test
+    public void shouldDeserializeSaveUserByXMLUsingXML(){
+        User user = new User("Usuario XML",40);
+
+        User usuarioInserido = given()
+                .log().all()
+                .contentType("application/XML")
+                .body(user)
+                .when()
+                .post("/usersXML")
+                .then()
+                .log().all()
+                .statusCode(201)
+                .extract().body().as(User.class)
+                ;
+        System.out.println(usuarioInserido);
+        Assert.assertThat(usuarioInserido.getId(), notNullValue());
+        Assert.assertThat(usuarioInserido.getName(), is("Usuario XML"));
+        Assert.assertThat(usuarioInserido.getAge(), is(40));
+        Assert.assertThat(usuarioInserido.getSalary(), notNullValue());
+    }
+
+    @Test
     public void shouldBeUser(){
         given()
                 .log().all()
