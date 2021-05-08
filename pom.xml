@@ -59,6 +59,12 @@
             <version>2.23.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
 
     </dependencies>
 </project>
